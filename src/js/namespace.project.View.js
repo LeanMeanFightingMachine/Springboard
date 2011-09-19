@@ -20,20 +20,13 @@ namespace.project.View = function( model, controller, dom ) {
 	
 	var self = this;
 	
-	this._controller.listen(this, namespace.project.Notification.TIME_UPDATED, this.updateTime);
+	this._controller.listen(this, namespace.project.Notification.START, this.start);
 }
 
-/**
- * The message to prefix the current time with
- * @const
- * @type {string}
- */
-namespace.project.View.TIME_PREFIX = "The Time Is: ";
 
 /**
- * Updates the current time displayed in the view
- * @param {Date} time The time to display
+ * Start the view
  */
-namespace.project.View.prototype.updateTime = function( ) {
-	this._dom.output.html( namespace.project.View.TIME_PREFIX + this._model.getTime().toString() );
+namespace.project.View.prototype.start = function( ) {
+	
 }

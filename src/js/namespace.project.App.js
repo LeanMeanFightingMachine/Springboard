@@ -7,33 +7,19 @@ goog.require('namespace.project.Command');
 
 goog.require('Logger');
 
-namespace.project.App = function( page ) {
+namespace.project.App = function( ) {
 	$(document).ready(function(){
-		/*
-			Determine which page we are on...
-		*/
-		
-		Logger.debug( "document.ready :: " + page );
 		
 		var	controller,
 			model,
 			view,
 			dom = {};
+			
+		model		= new namespace.project.Model();
+		controller	= new namespace.project.Controller( model );
+		view		= new namespace.project.View( model, controller, dom );
 		
-		switch( page ) {
-			
-			case "index" : default :
-			
-				dom.output = $("#output");
-				
-				model		= new namespace.project.Model();
-				controller	= new namespace.project.Controller( model );
-				view		= new namespace.project.View( model, controller, dom );
-				
-				controller.command(namespace.project.Command.START_TIMER);
-				
-			break;
-		}
+		controller.command(namespace.project.Command.START);	
 	});
 }
 

@@ -398,6 +398,9 @@
 		<copy todir="${BUILD_DIR}" failonerror="false" verbose="true">
 			<filelist dir="${SRC_DIR}" files="${linked}" />
 		</copy>
+		
+		<dirname property="directoryProperty" file="${BUILD_DIR}/${OUTPUT_SRC_JS}"/>
+ 		<mkdir dir="${directoryProperty}" />
 	</target>
 	
 	<!--

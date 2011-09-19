@@ -15,17 +15,3 @@ namespace.project.Model = function( data ) {
 	 */
 	this._data = data || {};
 }
-
-/**
- * @return {Date} The current time.
- */
-namespace.project.Model.prototype.getTime = function() {
-	return this._data.time;
-}
-
-/**
- * @param {Date} time The current time
- */
-namespace.project.Model.prototype.setTime = function( time ) {
-	this._data.time = time;
-}
