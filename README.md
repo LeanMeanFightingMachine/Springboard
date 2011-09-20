@@ -19,7 +19,7 @@ Quick Setup
 To get started, first clone the repository:
 
 	cd /your/workspace
-	git clone git@github.com:frazbot/Springboard.git YourProjectName
+	git clone git@github.com:leanmeanfightingmachine/Springboard.git YourProjectName
 
 Update the **AUTHOR** and **NAMESPACE** variables in the **build.properties** file.
 

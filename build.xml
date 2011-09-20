@@ -378,19 +378,30 @@
 			</sequential>
 		</for>
 
-		<echo>Combining CSS Libraries...
-		</echo>
 		
-		<concat destfile="${BUILD_DIR}/${OUTPUT_LIB_CSS}" append="true">
-			<filelist dir="${SRC_DIR}" files="${blocks.lib.css}"/>
-		</concat>
+		<if> 
+   			<isset property="blocks.lib.css"/> 
+   			<then>
+   				<echo>Combining CSS Libraries...
+				</echo>
+				
+				<concat destfile="${BUILD_DIR}/${OUTPUT_LIB_CSS}" append="true">
+					<filelist dir="${SRC_DIR}" files="${blocks.lib.css}"/>
+				</concat>
+			</then>
+		</if>
 		
-		<echo>Combining CSS Source Files...
-		</echo>
-		
-		<concat destfile="${BUILD_DIR}/${OUTPUT_SRC_CSS}" append="true">
-			<filelist dir="${SRC_DIR}" files="${blocks.src.css}"/>
-		</concat>
+		<if> 
+   			<isset property="blocks.src.css"/> 
+   			<then>
+				<echo>Combining CSS Source...
+				</echo>
+				
+				<concat destfile="${BUILD_DIR}/${OUTPUT_SRC_CSS}" append="true">
+					<filelist dir="${SRC_DIR}" files="${blocks.src.css}"/>
+				</concat>
+			</then>
+		</if>
 		
 		<echo>Copying Referenced Files...
 		</echo>
@@ -399,6 +410,11 @@
 			<filelist dir="${SRC_DIR}" files="${linked}" />
 		</copy>
 		
+		<!--
+		
+		If the js directory is not created, create it
+		
+		-->
 		<dirname property="directoryProperty" file="${BUILD_DIR}/${OUTPUT_SRC_JS}"/>
  		<mkdir dir="${directoryProperty}" />
 	</target>
@@ -410,8 +426,29 @@
 	-->
 	
 	<target name="minify">
-		<yui-minify target="${BUILD_DIR}/${OUTPUT_SRC_CSS}" />
-		<yui-minify target="${BUILD_DIR}/${OUTPUT_LIB_CSS}" />
+		
+		<if>
+			<resourceexists>
+  				<file file="${BUILD_DIR}/${OUTPUT_LIB_CSS}"/>
+			</resourceexists>
+			<then>
+				<echo>Minify CSS Libraries...
+				</echo>
+				<yui-minify target="${BUILD_DIR}/${OUTPUT_LIB_CSS}" />
+			</then>
+		</if>
+		
+		<if>
+			<resourceexists>
+  				<file file="${BUILD_DIR}/${OUTPUT_SRC_CSS}"/>
+			</resourceexists>
+			<then>
+				<echo>Minify CSS Source...
+				</echo>
+				<yui-minify target="${BUILD_DIR}/${OUTPUT_SRC_CSS}" />
+			</then>
+		</if>
+		
 	</target>
 	
 	<!--
