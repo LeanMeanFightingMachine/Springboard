@@ -55,7 +55,13 @@ To do this, run **update**:
 
 ###Building
 
-To compile your project and create a deploy version, run **build**:
+To compile your project, run **build**:
+
+	ant build
+	
+###Deploying
+
+To compile your project for deployment without any logs, run **deploy**:
 
 	ant build
 
