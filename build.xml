@@ -58,13 +58,52 @@
 	
 	<target name="update" depends="deps" />
 
+	
 	<!--
 	
-		Execute all processes
+		Build
 		
 	-->
 	
-	<target name="build" depends="clean, copy, minify, compile" />
+	<target name="build">
+		<delete dir="${BUILD_DIR}"/>
+		<mkdir dir="${BUILD_DIR}"/>
+		
+		<antcall target="copy">
+			<param name="destination" value="${BUILD_DIR}"/>
+		</antcall>
+		<antcall target="minify">
+			<param name="destination" value="${BUILD_DIR}"/>
+		</antcall>
+		<antcall target="temp"/>
+		<antcall target="compile">
+			<param name="destination" value="${BUILD_DIR}"/>
+		</antcall>
+	</target>
+	
+	
+	<!--
+	
+		Deploy
+		
+	-->
+	
+	<target name="deploy">
+		<delete dir="${DEPLOY_DIR}"/>
+		<mkdir dir="${DEPLOY_DIR}"/>
+		
+		<antcall target="copy">
+			<param name="destination" value="${DEPLOY_DIR}"/>
+		</antcall>
+		<antcall target="minify">
+			<param name="destination" value="${DEPLOY_DIR}"/>
+		</antcall>
+		<antcall target="temp"/>
+		<antcall target="tidy"/>
+		<antcall target="compile">
+			<param name="destination" value="${DEPLOY_DIR}"/>
+		</antcall>
+	</target>
 	
 	<!--
 		
@@ -99,7 +138,75 @@
 		</echo>
 		<delete dir="${BUILD_DIR}"/>
 		<mkdir dir="${BUILD_DIR}"/>
+		<delete dir="${DEPLOY_DIR}"/>
+		<mkdir dir="${DEPLOY_DIR}"/>
 	</target>
+	
+	<!--
+	
+		Copy to temp
+		
+	-->
+	
+	<target	name="temp">
+		<echo>Copying to temp...
+		</echo>
+		
+		<delete dir="${TEMP_DIR}"/>
+		<mkdir dir="${TEMP_DIR}"/>
+		
+		<copy toDir="${TEMP_DIR}" verbose="true" >
+			<fileset dir="${SRC_DIR}/${JS_DIR}" />
+		</copy>
+		
+	</target>
+	
+	<!--
+	
+		Tidy up logs
+		
+	-->
+	
+	<target	name="tidy">
+		<echo>Tidying up logs...
+		</echo>
+		
+		<for param="file">
+			
+			<fileset dir="${TEMP_DIR}"/>
+			
+			<sequential>
+				
+				<var name="file" value="@{file}" />
+				<var name="content" unset="true" />
+				<loadfile property="content" srcFile="@{file}"/>
+				
+				<echo>Processing page: @{file}...
+				</echo>
+				
+				<script language="javascript">
+					<![CDATA[
+						function log(msg) { echo = project.createTask("echo"); copy.addTask(echo); echo.setMessage(msg); }
+						
+						var content = project.getProperty( "content" );
+						
+						content = new String( content );
+						
+						content = content.replace( /Logger.debug\(.*\);/g, '' );
+						
+						// update properties
+						
+						project.setProperty( "content", content );
+						
+					]]>
+				</script>
+				
+				<echo  message="${content}" output="@{file}" />
+			</sequential>
+		</for>
+		
+	</target>
+	
 	
 	<!--
 	
@@ -223,7 +330,7 @@
 		<echo>Copying static resources...
 		</echo>
 		
-		<copy toDir="${BUILD_DIR}" verbose="true" >
+		<copy toDir="${destination}" verbose="true" >
 			<fileset dir="${SRC_DIR}" includes="**/*" excludes="${JS_DIR}/**,${CSS_DIR}/**" />
 		</copy>
 		
@@ -232,7 +339,7 @@
 		
 		<for param="file">
 			
-			<fileset dir="${BUILD_DIR}" includes="${pages}"/>
+			<fileset dir="${destination}" includes="${pages}"/>
 			
 			<sequential>
 				
@@ -385,7 +492,7 @@
    				<echo>Combining CSS Libraries...
 				</echo>
 				
-				<concat destfile="${BUILD_DIR}/${OUTPUT_LIB_CSS}" append="true">
+				<concat destfile="${destination}/${OUTPUT_LIB_CSS}" append="true">
 					<filelist dir="${SRC_DIR}" files="${blocks.lib.css}"/>
 				</concat>
 			</then>
@@ -397,7 +504,7 @@
 				<echo>Combining CSS Source...
 				</echo>
 				
-				<concat destfile="${BUILD_DIR}/${OUTPUT_SRC_CSS}" append="true">
+				<concat destfile="${destination}/${OUTPUT_SRC_CSS}" append="true">
 					<filelist dir="${SRC_DIR}" files="${blocks.src.css}"/>
 				</concat>
 			</then>
@@ -406,7 +513,7 @@
 		<echo>Copying Referenced Files...
 		</echo>
 			
-		<copy todir="${BUILD_DIR}" failonerror="false" verbose="true">
+		<copy todir="${destination}" failonerror="false" verbose="true">
 			<filelist dir="${SRC_DIR}" files="${linked}" />
 		</copy>
 		
@@ -415,8 +522,9 @@
 		If the js directory is not created, create it
 		
 		-->
-		<dirname property="directoryProperty" file="${BUILD_DIR}/${OUTPUT_SRC_JS}"/>
+		<dirname property="directoryProperty" file="${destination}/${OUTPUT_SRC_JS}"/>
  		<mkdir dir="${directoryProperty}" />
+ 		
 	</target>
 	
 	<!--
@@ -429,23 +537,23 @@
 		
 		<if>
 			<resourceexists>
-  				<file file="${BUILD_DIR}/${OUTPUT_LIB_CSS}"/>
+  				<file file="${destination}/${OUTPUT_LIB_CSS}"/>
 			</resourceexists>
 			<then>
 				<echo>Minify CSS Libraries...
 				</echo>
-				<yui-minify target="${BUILD_DIR}/${OUTPUT_LIB_CSS}" />
+				<yui-minify target="${destination}/${OUTPUT_LIB_CSS}" />
 			</then>
 		</if>
 		
 		<if>
 			<resourceexists>
-  				<file file="${BUILD_DIR}/${OUTPUT_SRC_CSS}"/>
+  				<file file="${destination}/${OUTPUT_SRC_CSS}"/>
 			</resourceexists>
 			<then>
 				<echo>Minify CSS Source...
 				</echo>
-				<yui-minify target="${BUILD_DIR}/${OUTPUT_SRC_CSS}" />
+				<yui-minify target="${destination}/${OUTPUT_SRC_CSS}" />
 			</then>
 		</if>
 		
@@ -459,21 +567,23 @@
 	
 	<target	name="compile">
 		
-		<echo>Compiling '${OUTPUT_SRC_JS}' with Closure Compiler...
+		<echo>Compiling with Closure Compiler...
 		</echo>
 		
 		<exec executable="python" failonerror="yes">
 			<arg line='${CLOSURE_BUILDER}'/>
 			<arg line='--root=${CLOSURE_LIB}' />
-			<arg line='--root=${SRC_DIR}/${JS_DIR}/'/>
+			<arg line='--root=${TEMP_DIR}/'/>
 			<arg line='--namespace="${NAMESPACE}.${MAIN}"'/>
 			<arg line='--output_mode=compiled'/>
 			<arg line='--compiler_jar=${COMPILER}'/>
 			<arg line='--compiler_flags="--compilation_level=${COMPILATION}"'/>
-			<arg line='--compiler_flags="--externs=${SRC_DIR}/${EXTERNS}"'/>
+			<arg line='--compiler_flags="--externs=${TEMP_DIR}/${EXTERNS}"'/>
 			<arg line='--compiler_flags="--warning_level=VERBOSE"'/>
-			<arg line='--output_file=${BUILD_DIR}/${OUTPUT_SRC_JS}'/>
+			<arg line='--output_file=${destination}/${OUTPUT_SRC_JS}'/>
 		</exec>
+		
+		<delete dir="${TEMP_DIR}"/>
 		
 	</target>
 	
@@ -491,7 +601,7 @@
 		<exec executable="python" failonerror="yes">
 			<arg line='${DEPS_WRITER}'/>
 			<arg line='--root_with_prefix="${SRC_DIR}/${JS_DIR}/ ../../../../${SRC_DIR}/${JS_DIR}/"' />
-			<arg line='--output_file=${SRC_DIR}/${DEPS}'/>
+			<arg line='--output_file=${SRC_DIR}/${JS_DIR}/${DEPS}'/>
 		</exec>
 		
 	</target>
