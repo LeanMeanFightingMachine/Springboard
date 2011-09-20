@@ -626,27 +626,6 @@
 			<fileset dir="${SRC_DIR}/${JS_DIR}/" includes="${NAMESPACE}*" />
 		</jsdoctoolkit>
 		
-		<!--
-		<exec executable="java" failonerror="true">
-			<arg line="-jar ${JSDOC}/jsrun.jar ${JSDOC}/app/run.js" />
-			<arg line="-t=${JSDOC}/templates/jsdoc" />
-			<arg line="-d=${basedir}/${DOCS_DIR}" />
-			<arg line="${SRC_DIR}/${JS_DIR}/" />
-			<arg line="-a" />
-		</exec>
-		-->
-		
-		<!-- Pre-release JSDoc 3 setup: https://github.com/micmath/jsdoc/
-		
-		<exec executable="java" failonerror="true">
-			<arg line="-jar ${JSDOC}/jsdoc.jar" />
-			<arg line="${SRC_DIR}/${JS_DIR}/" />
-			<arg line="-d ${basedir}/${DOCS_DIR}" />
-			<arg line="-r" />
-		</exec>
-		
-		-->
-		
 	</target>
 	
 </project>

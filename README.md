@@ -63,7 +63,7 @@ To compile your project, run **build**:
 
 To compile your project for deployment without any logs, run **deploy**:
 
-	ant build
+	ant deploy
 
 ###Documenting
 
