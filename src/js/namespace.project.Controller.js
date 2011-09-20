@@ -17,12 +17,6 @@ namespace.project.Controller = function( model ) {
 	Dispatcher.call(this);
 	
 	this._model = model;
-	
-	/**
-	 * @private
-	 * @type {number}
-	 */
-	this._timer;
 }
 
 goog.inherits(namespace.project.Controller, Dispatcher);

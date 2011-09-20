@@ -8,6 +8,7 @@ goog.require('namespace.project.Command');
 goog.require('Logger');
 
 namespace.project.App = function( ) {
+	
 	$(document).ready(function(){
 		
 		var	controller,
@@ -19,7 +20,7 @@ namespace.project.App = function( ) {
 		controller	= new namespace.project.Controller( model );
 		view		= new namespace.project.View( model, controller, dom );
 		
-		controller.command(namespace.project.Command.START);	
+		controller.command(namespace.project.Command.START);
 	});
 }
 

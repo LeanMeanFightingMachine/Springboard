@@ -28,5 +28,5 @@ namespace.project.View = function( model, controller, dom ) {
  * Start the view
  */
 namespace.project.View.prototype.start = function( ) {
-	
+	Logger.debug("start");
 }
